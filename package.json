@@ -9,7 +9,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@babel/plugin-proposal-optional-chaining": "^7.16.7",
+    "@babel/preset-env": "^7.16.11",
+    "axios": "^0.26.0",
     "core-js": "^3.6.5",
+    "crypto-js": "^4.1.1",
+    "cryptojs": "^2.5.3",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^2.13.216",
     "vue": "^3.0.0",
     "vue-class-component": "^8.0.0-0",
     "vue-router": "^4.0.0-0",
@@ -17,7 +24,9 @@
   },
   "devDependencies": {
     "@types/chai": "^4.2.11",
+    "@types/crypto-js": "^4.1.1",
     "@types/mocha": "^5.2.4",
+    "@types/pdfjs-dist": "^2.10.378",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-babel": "~4.5.15",
