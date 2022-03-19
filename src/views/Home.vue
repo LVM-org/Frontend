@@ -1,8 +1,14 @@
 <template>
-  <div style="display: flex; align-content: center; justify-content: center">
-    <div>
-      <button @click="goToNextPrev()">Prev page</button>
-      <button @click="goToNextPage()">Next page</button>
+  <div class="fixed flex flex-col space-y-2 h-full w-full">
+    <div class="flex flex-col space-y-1 items-center justify-center">
+      <h1 class="font-semibold capitalize">upload SPF file</h1>
+      <input type="file" accept=".spf" @change="handleFile" />
+    </div>
+    <div class="flex flex-row space-x-2 items-center justify-center">
+      <button @click="goToNextPrev()" class="bg-green-500 py-2 px-4">Prev page</button>
+      <button @click="goToNextPage()" class="bg-green-500 py-2 px-4">Next page</button>
+    </div>
+    <div class="w-full flex flex-col items-center justify-center">
       <div id="pdf-wrapper"></div>
     </div>
   </div>
@@ -17,7 +23,6 @@ import "pdfjs-dist/";
 import CryptoJS from "crypto-js";
 import axios from "axios";
 import { PDFDocument } from "pdf-lib";
-import { PDFDocumentProxy } from "pdfjs-dist/";
 
 export default defineComponent({
   setup() {
@@ -75,9 +80,17 @@ export default defineComponent({
 
     const newPdfData = ref();
 
-    const mainpdfViewerContainer = ref();
+    const handleFile = (e: any) => {
+      let file = e.target.files[0];
 
-    const mainPdfDocument = ref<PDFDocumentProxy>();
+      const reader = new FileReader();
+
+      reader.onload = (fileLoadedEvent: any) => {
+        fileContent.value = JSON.parse(fileLoadedEvent.target.result);
+      };
+
+      reader.readAsText(file);
+    };
 
     axios
       .get("http://localhost:8080/52DcMvYD2sgXD14E4DhQdms4KyDZA2sKQXx5zosxuNNN.spf")
@@ -139,7 +152,13 @@ export default defineComponent({
         await loadingTask.promise.then(async (pdfDocument) => {
           const container = document.querySelector("#pdf-wrapper");
 
-          const SCALE = 1.0;
+          if (container) {
+            container.innerHTML = "";
+          }
+
+          const SCALE = 0.4;
+
+          var CSS_UNITS = 96 / 72;
 
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -149,6 +168,13 @@ export default defineComponent({
 
           // Document loaded, retrieving the page.
           const pdfPage = await pdfDocument.getPage(1);
+
+          const viewport = pdfPage.getViewport({ scale: SCALE });
+
+          var scale = container?.clientWidth || 0 / (viewport.width * CSS_UNITS);
+
+          console.log(scale);
+
           // Creating the page view with default parameters.
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -158,7 +184,7 @@ export default defineComponent({
             container,
             id: 1,
             scale: SCALE,
-            defaultViewport: pdfPage.getViewport({ scale: SCALE }),
+            defaultViewport: pdfPage.getViewport({ scale }),
             eventBus,
             // We can enable text/annotation/xfa/struct-layers, as needed.
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -187,7 +213,7 @@ export default defineComponent({
     };
 
     const goToNextPage = () => {
-      if (pageNumber.value == totalPages.value - 1) return;
+      if (pageNumber.value == totalPages.value) return;
       pageNumber.value++;
     };
 
@@ -215,6 +241,7 @@ export default defineComponent({
     return {
       goToNextPrev,
       goToNextPage,
+      handleFile,
     };
   },
 });
